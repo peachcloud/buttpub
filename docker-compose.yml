@@ -18,6 +18,7 @@ services:
       - "8901:8901"
     environment:
       - ssb_host=peer-server
+      - ssb_landing__host=landing
       - VIRTUAL_HOST=two.butt.nz
     volumes:
       - ssb:/home/node/.ssb
@@ -30,8 +31,6 @@ services:
 
   nginx-proxy:
     image: jwilder/nginx-proxy
-    ports:
-      - "80:8080"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
 
