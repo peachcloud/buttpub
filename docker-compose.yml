@@ -1,0 +1,52 @@
+version: "3"
+services:
+  peer-server:
+    image: buttcloud/butt-peer-server:v1.0.1
+    ports:
+      - "8008:8008"
+    environment:
+      - ssb_host=two.butt.nz
+    networks:
+      - public
+      - private
+    volumes:
+      - ssb:/home/node/.ssb
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+
+  landing:
+    image: buttcloud/butt-landing:v1.0.1
+    ports:
+      - "8901:8901"
+    environment:
+      - ssb_host=two.butt.nz
+      - VIRTUAL_HOST=two.butt.nz
+    networks:
+      - private
+    volumes:
+      - ssb:/home/node/.ssb
+    depends_on:
+      - peer-server
+      - nginx-proxy
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:8080"
+    networks:
+      - public
+      - private
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+networks:
+  public:
+  private:
+    internal: true
+
+volumes:
+  ssb:
