@@ -1,4 +1,4 @@
-version: "3"
+version: "3.6"
 services:
   peer-server:
     image: buttcloud/butt-peer-server:v1.0.1
@@ -8,6 +8,10 @@ services:
       - ssb_host=peer-server
     volumes:
       - ssb:/home/node/.ssb
+    networks:
+      - default
+    labels:
+      - "traefik.enable=false"
     deploy:
       restart_policy:
         condition: on-failure
@@ -17,54 +21,49 @@ services:
     environment:
       - ssb_host=peer-server
       - ssb_landing__host=landing
-      - VIRTUAL_HOST=${HOST:-example.butt.nz}
     volumes:
       - ssb:/home/node/.ssb
+    networks:
+      - proxy
+      - default
     deploy:
       labels:
         - "traefik.enable=true"
+        - "traefik.backend=landing"
         - "traefik.port=8901"
-        - "traefik.docker.network=default"
         - "traefik.frontend.rule=Host:${HOST:-example.butt.nz}"
+        - "traefik.docker.network=proxy"
       restart_policy:
         condition: on-failure
 
-  reverse-proxy:
+  proxy:
     image: traefik
-    command:
-      - --api
-      - --entryPoints='Name:http Address::80 Redirect.EntryPoint:https'
-      - --entryPoints='Name:https Address::443 TLS'
-      - --docker
-      - --docker.swarmmode
-      - --docker.domain=traefik
-      - --docker.watch
-      - --docker.exposedbydefault=false
-      - --acme.email=michael.williams@enspiral.com
-      - --acme.storage=acme.json
-      - --acme.entryPoint=https
-      - --acme.onDemand=true
-      - --acme.OnHostRule=true
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080" # the web ui enabled by --api
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    cap_drop:
-      - all
-    cap_add:
-      - net_bind_service
+    configs:
+      - source: traefik.toml
+        target: /etc/traefik/traefik.toml
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=false"
     deploy:
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.role == manager]   
       restart_policy:
         condition: on-failure
 
+configs:  
+  traefik.toml:
+    file: ./traefik.toml
+
+networks:  
+  proxy:
+    external: true
+
 volumes:
   ssb:
-  traefik-conf:
-  nginx-vhost:
-  nginx-html:
-  nginx-certs:
-  nginx-htpasswd:
