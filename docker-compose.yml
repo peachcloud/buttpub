@@ -10,7 +10,7 @@ services:
       - ssb:/home/node/.ssb
     deploy:
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
 
   landing:
     image: buttcloud/butt-landing:v1.0.3
@@ -20,18 +20,14 @@ services:
       - VIRTUAL_HOST=${HOST:-example.butt.nz}
     volumes:
       - ssb:/home/node/.ssb
-    depends_on:
-      - peer-server
     deploy:
       restart_policy:
-        condition: unless-stopped
+        condition: on-failure
 
   nginx-web:
     image: nginx
     labels:
         com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
-    container_name: ${NGINX_WEB:-nginx-web}
-    restart: always
     ports:
       - "${IP:-0.0.0.0}:80:80"
       - "${IP:-0.0.0.0}:443:443"
@@ -45,12 +41,15 @@ services:
       options:
         max-size: ${NGINX_WEB_LOG_MAX_SIZE:-4m}
         max-file: ${NGINX_WEB_LOG_MAX_FILE:-10}
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
 
   nginx-gen:
     image: jwilder/docker-gen
     command: -notify-sighup ${NGINX_WEB:-nginx-web} -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
-    container_name: ${DOCKER_GEN:-nginx-gen}
-    restart: always
     volumes:
       - nginx-conf:/etc/nginx/conf.d
       - nginx-vhost:/etc/nginx/vhost.d
@@ -63,11 +62,14 @@ services:
       options:
         max-size: ${NGINX_GEN_LOG_MAX_SIZE:-2m}
         max-file: ${NGINX_GEN_LOG_MAX_FILE:-10}
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: ${LETS_ENCRYPT:-nginx-letsencrypt}
-    restart: always
     volumes:
       - nginx-conf:/etc/nginx/conf.d
       - nginx-vhost:/etc/nginx/vhost.d
@@ -81,6 +83,11 @@ services:
       options:
         max-size: ${NGINX_LETSENCRYPT_LOG_MAX_SIZE:-2m}
         max-file: ${NGINX_LETSENCRYPT_LOG_MAX_FILE:-10}
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
 
 volumes:
   ssb:

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "deploy": "docker stack deploy --compose-file docker-compose.yml example",
+    "ls": "docker stack ls",
+    "ps": "docker stack ps example",
+    "rm": "docker stack rm example",
+    "services": "docker stack services example"
+  }
+}
