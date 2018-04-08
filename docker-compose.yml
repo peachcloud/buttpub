@@ -3,7 +3,7 @@ services:
   peer-server:
     image: buttcloud/butt-peer-server:v1.0.1
     ports:
-      - "${IP:-0.0.0.0}:8008:8008"
+      - "8008:8008"
     environment:
       - ssb_host=peer-server
     volumes:
@@ -21,68 +21,40 @@ services:
     volumes:
       - ssb:/home/node/.ssb
     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=8901"
+        - "traefik.docker.network=default"
+        - "traefik.frontend.rule=Host:${HOST:-example.butt.nz}"
       restart_policy:
         condition: on-failure
 
-  nginx-web:
-    image: nginx
-    labels:
-        com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+  reverse-proxy:
+    image: traefik
+    command:
+      - --api
+      - --entryPoints='Name:http Address::80 Redirect.EntryPoint:https'
+      - --entryPoints='Name:https Address::443 TLS'
+      - --docker
+      - --docker.swarmmode
+      - --docker.domain=traefik
+      - --docker.watch
+      - --docker.exposedbydefault=false
+      - --acme.email=michael.williams@enspiral.com
+      - --acme.storage=acme.json
+      - --acme.entryPoint=https
+      - --acme.onDemand=true
+      - --acme.OnHostRule=true
     ports:
-      - "${IP:-0.0.0.0}:80:80"
-      - "${IP:-0.0.0.0}:443:443"
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # the web ui enabled by --api
     volumes:
-      - nginx-conf:/etc/nginx/conf.d
-      - nginx-vhost:/etc/nginx/vhost.d
-      - nginx-html:/usr/share/nginx/html
-      - nginx-certs:/etc/nginx/certs:ro
-      - nginx-htpasswd:/etc/nginx/htpasswd:ro
-    logging:
-      options:
-        max-size: ${NGINX_WEB_LOG_MAX_SIZE:-4m}
-        max-file: ${NGINX_WEB_LOG_MAX_FILE:-10}
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-
-  nginx-gen:
-    image: jwilder/docker-gen
-    command: -notify-sighup ${NGINX_WEB:-nginx-web} -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
-    volumes:
-      - nginx-conf:/etc/nginx/conf.d
-      - nginx-vhost:/etc/nginx/vhost.d
-      - nginx-html:/usr/share/nginx/html
-      - nginx-certs:/etc/nginx/certs:ro
-      - nginx-htpasswd:/etc/nginx/htpasswd:ro
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
-    logging:
-      options:
-        max-size: ${NGINX_GEN_LOG_MAX_SIZE:-2m}
-        max-file: ${NGINX_GEN_LOG_MAX_FILE:-10}
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-
-  nginx-letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    volumes:
-      - nginx-conf:/etc/nginx/conf.d
-      - nginx-vhost:/etc/nginx/vhost.d
-      - nginx-html:/usr/share/nginx/html
-      - nginx-certs:/etc/nginx/certs:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      NGINX_DOCKER_GEN_CONTAINER: ${DOCKER_GEN:-nginx-gen}
-      NGINX_PROXY_CONTAINER: ${NGINX_WEB:-nginx-web}
-    logging:
-      options:
-        max-size: ${NGINX_LETSENCRYPT_LOG_MAX_SIZE:-2m}
-        max-file: ${NGINX_LETSENCRYPT_LOG_MAX_FILE:-10}
+      - /var/run/docker.sock:/var/run/docker.sock
+    cap_drop:
+      - all
+    cap_add:
+      - net_bind_service
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -91,7 +63,7 @@ services:
 
 volumes:
   ssb:
-  nginx-conf:
+  traefik-conf:
   nginx-vhost:
   nginx-html:
   nginx-certs:
