@@ -8,6 +8,7 @@
     "stack:ls": "docker stack ls",
     "stack:ps": "docker stack ps example",
     "stack:rm": "docker stack rm example",
-    "stack:services": "docker stack services example"
+    "stack:services": "docker stack services example",
+    "sbot": "docker run -it --rm --init -v example_ssb:/home/node/.ssb --net host buttcloud/butt-peer-client"
   }
 }

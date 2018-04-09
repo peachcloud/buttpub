@@ -17,16 +17,13 @@ services:
         condition: on-failure
     networks:
       - ssb
+      - default
 
   landing:
     image: buttcloud/butt-landing:v1.0.3
     environment:
       - ssb_host=peer-server
       - ssb_landing__host=landing
-    ports:
-      - target: 8901
-        published: 8901
-        mode: host
     volumes:
       - ssb:/home/node/.ssb
     deploy:
@@ -35,7 +32,7 @@ services:
         - "traefik.backend=landing"
         - "traefik.port=8901"
         - "traefik.frontend.rule=Host:${HOST:-example.butt.nz}"
-        - "traefik.docker.network=web"
+        - "traefik.docker.network=webproxy"
       restart_policy:
         condition: on-failure
     networks:
@@ -82,6 +79,7 @@ services:
         condition: on-failure
     networks:
       - webproxy
+      - default
 
 volumes:
   ssb:
