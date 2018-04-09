@@ -1,6 +1,9 @@
 {
   "scripts": {
-    "network:create": "docker network create --driver=overlay web",
+    "network:create": "docker network create --driver=overlay webproxy",
+    "network:rm": "docker network rm webproxy",
+    "volume:create": "docker volume create example_ssb",
+    "volume:rm": "docker volume rm example_ssb",
     "stack:deploy": "docker stack deploy --compose-file docker-compose.yml example",
     "stack:ls": "docker stack ls",
     "stack:ps": "docker stack ps example",
