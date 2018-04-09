@@ -1,9 +1,10 @@
 {
   "scripts": {
-    "deploy": "docker stack deploy --compose-file docker-compose.yml example",
-    "ls": "docker stack ls",
-    "ps": "docker stack ps example",
-    "rm": "docker stack rm example",
-    "services": "docker stack services example"
+    "network:create": "docker network create --driver=overlay web",
+    "stack:deploy": "docker stack deploy --compose-file docker-compose.yml example",
+    "stack:ls": "docker stack ls",
+    "stack:ps": "docker stack ps example",
+    "stack:rm": "docker stack rm example",
+    "stack:services": "docker stack services example"
   }
 }
