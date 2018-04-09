@@ -7,7 +7,7 @@ services:
         published: 8008
         mode: host
     environment:
-      - ssb_host=peer-server
+      - ssb_host=${STACK_NAME}_peer-server
     volumes:
       - ssb:/home/node/.ssb
     labels:
@@ -21,21 +21,21 @@ services:
   landing:
     image: buttcloud/butt-landing:v1.0.3
     environment:
-      - ssb_host=peer-server
-      - ssb_landing__host=landing
+      - ssb_host=${STACK_NAME}_peer-server
+      - ssb_landing__host=${STACK_NAME}_landing
     volumes:
       - ssb:/home/node/.ssb
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.backend=landing"
+        - "traefik.backend=${STACK_NAME}_landing"
         - "traefik.port=8901"
         - "traefik.frontend.rule=Host:${HOST:-example.butt.nz}"
-        - "traefik.docker.network=webproxy"
+        - "traefik.docker.network=${STACK_NAME}_web"
       restart_policy:
         condition: on-failure
     networks:
-      - webproxy
+      - web
       - ssb
 
   webproxy:
@@ -52,13 +52,13 @@ services:
 #      - "--acme.OnHostRule=true"
 #      - "--acme.onDemand=false"
 #      - "--acme.email=contact@mydomain.ca"
-      - "--docker"
+#      - "--docker"
       - "--docker.swarmmode"
       - "--docker.domain=butt.nz"
       - "--docker.exposedbydefault=false"
       - "--docker.watch"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik-acme:/etc/traefik/acme:rw
     ports:
       - target: 80
@@ -77,13 +77,12 @@ services:
       restart_policy:
         condition: on-failure
     networks:
-      - webproxy
+      - web
 
 volumes:
   ssb:
   traefik-acme:
 
 networks:
-  webproxy:
-    external: true
+  web:
   ssb:

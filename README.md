@@ -15,7 +15,6 @@ cd butt
 wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl
 docker swarm init
 npm run swarm:init
-npm run network:create
 npm run stack:deploy
 npm run sbot whoami
 curl -H "Host: example.butt.nz" localhost
