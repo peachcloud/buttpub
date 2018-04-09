@@ -17,7 +17,6 @@ services:
         condition: on-failure
     networks:
       - ssb
-      - default
 
   landing:
     image: buttcloud/butt-landing:v1.0.3
@@ -55,7 +54,7 @@ services:
 #      - "--acme.email=contact@mydomain.ca"
       - "--docker"
       - "--docker.swarmmode"
-      - "--docker.domain=mydomain.ca"
+      - "--docker.domain=butt.nz"
       - "--docker.exposedbydefault=false"
       - "--docker.watch"
     volumes:
@@ -79,7 +78,6 @@ services:
         condition: on-failure
     networks:
       - webproxy
-      - default
 
 volumes:
   ssb:

@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "swarm:init": "docker swarm init",
     "network:create": "docker network create --driver=overlay webproxy",
     "network:rm": "docker network rm webproxy",
     "volume:create": "docker volume create example_ssb",

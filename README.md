@@ -14,7 +14,10 @@ git clone https://github.com/buttcloud/butt
 cd butt
 wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl
 docker swarm init
-docker stack deploy --compose-file docker-compose.yml example
+npm run swarm:init
+npm run network:create
+npm run stack:deploy
+npm run sbot whoami
 curl -H "Host: example.butt.nz" localhost
 ```
 
