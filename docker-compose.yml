@@ -7,7 +7,7 @@ services:
         published: 8008
         mode: host
     environment:
-      - ssb_host=${STACK_NAME}_peer-server
+      - ssb_host=0.0.0.0
     volumes:
       - ssb:/home/node/.ssb
     labels:
@@ -22,7 +22,7 @@ services:
     image: buttcloud/butt-landing:v1.0.3
     environment:
       - ssb_host=${STACK_NAME}_peer-server
-      - ssb_landing__host=${STACK_NAME}_landing
+      - ssb_landing__host=0.0.0.0
     volumes:
       - ssb:/home/node/.ssb
     deploy:
