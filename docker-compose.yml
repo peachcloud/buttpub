@@ -1,13 +1,13 @@
 version: "3.6"
 services:
   peer-server:
-    image: buttcloud/butt-peer-server:v1.0.1
+    image: buttcloud/butt-peer-server:v1.1.0
     ports:
       - target: 8008
         published: 8008
-        mode: host
     environment:
       - ssb_host=0.0.0.0
+      - ssb_externalHost=${HOST:-example.butt.nz}
     volumes:
       - ssb:/home/node/.ssb
     labels:
@@ -86,3 +86,4 @@ volumes:
 networks:
   web:
   ssb:
+    attachable: true

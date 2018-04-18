@@ -12,7 +12,6 @@ a complete, production-quality [Scuttlebutt](https://scuttlebutt.nz) pub server
 ```
 git clone https://github.com/buttcloud/butt
 cd butt
-wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl
 docker swarm init
 npm run swarm:init
 npm run stack:deploy
@@ -20,23 +19,23 @@ npm run sbot whoami
 curl -H "Host: example.butt.nz" localhost
 ```
 
+---
+
+ignore below...
+
 ## notes
 
 swarm nodes:
 
 - manager
-  - nginx things
-    - mount config
-    - mount certs
-    - mount ...
-  - haproxy things
-    - mount config
-  - buttcloud things
-    - mount haxproxy config
+  - traefik things
+    - mount acme
+  - buttcloud-provider
+
   - database
     - mount storage
 - worker
-  - ssb things
+  - butt things
     - data volume from cinder
 
 
@@ -47,13 +46,6 @@ volumes:
       name: ${COMPOSE_PROJECT_NAME}-ssb
 ```
 
----
+each pub needs it's own port.
 
-## ports
-
-IANA registered ports: https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
-
-dynamic and/or private ports: those from 49152 through 65535: 16383 total ports
-
-open question: is there a way to have a separate ipv6 address for each node?
-
+can be anything except what docker swarm needs: 2377, 7946, and 4789, so maybe start at 10000 and count up.

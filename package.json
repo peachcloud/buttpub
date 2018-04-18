@@ -10,6 +10,6 @@
     "stack:ps": "docker stack ps example",
     "stack:rm": "docker stack rm example",
     "stack:services": "docker stack services example",
-    "sbot": "docker run -it --rm --init -v example_ssb:/home/node/.ssb --net host buttcloud/butt-peer-client"
+    "sbot": "docker run -it --rm --init -v example_ssb:/home/node/.ssb --net example_ssb -e ssb_host=example_peer-server buttcloud/butt-peer-client"
   }
 }
