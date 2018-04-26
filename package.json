@@ -1,15 +1,21 @@
 {
   "scripts": {
     "swarm:init": "docker swarm init",
-    "network:create": "docker network create --driver=overlay example_web",
-    "network:rm": "docker network rm example_web",
-    "volume:create": "docker volume create example_ssb",
-    "volume:rm": "docker volume rm example_ssb",
-    "stack:deploy": "STACK_NAME=example docker stack deploy --compose-file docker-compose.yml example",
+    "network:web:create": "docker network create --driver=overlay web",
+    "network:web:rm": "docker network rm web",
+    "volume:ssb:create": "docker volume create example_ssb",
+    "volume:ssb:rm": "docker volume rm example_ssb",
+    "stack:hub:deploy": "STACK_NAME=hub docker stack deploy --compose-file stacks/hub.yml hub",
+    "stack:hub:ps": "docker stack ps hub",
+    "stack:hub:rm": "docker stack rm hub",
+    "stack:hub:services": "docker stack services hub",
+    "stack:pub:deploy": "STACK_NAME=pub docker stack deploy --compose-file stacks/pub.yml pub",
+    "stack:pub:ps": "docker stack ps pub",
+    "stack:pub:rm": "docker stack rm pub",
+    "stack:pub:services": "docker stack services pub",
     "stack:ls": "docker stack ls",
-    "stack:ps": "docker stack ps example",
-    "stack:rm": "docker stack rm example",
-    "stack:services": "docker stack services example",
-    "sbot": "docker run -it --rm --init -v example_ssb:/home/node/.ssb --net example_ssb -e ssb_host=example_peer-server buttcloud/butt-peer-client"
+    "service:logs": "docker service logs",
+    "inspect": "docker inspect",
+    "sbot": "docker run -it --rm --init -v pub_ssb:/home/node/.ssb --net pub_ssb -e ssb_host=pub_peer-server buttcloud/butt-peer-client"
   }
 }

@@ -12,40 +12,42 @@ a complete, production-quality [Scuttlebutt](https://scuttlebutt.nz) pub server
 ```
 git clone https://github.com/buttcloud/butt
 cd butt
-docker swarm init
 npm run swarm:init
-npm run stack:deploy
+npm run network:web:create
+npm run stack:hub:deploy
+npm run stack:pub:deploy
 npm run sbot whoami
 curl -H "Host: example.butt.nz" localhost
 ```
 
----
+## scripts
 
-ignore below...
+`npm run ${command}`
 
-## notes
+- `swarm:init`
+- `network:web:create`
+- `network:web:rm`
+- `volume:ssb:create`
+- `volume:ssb:rm`
+- `stack:hub:deploy`
+- `stack:hub:ps`
+- `stack:hub:rm`
+- `stack:hub:services`
+- `stack:pub:deploy`
+- `stack:pub:ps`
+- `stack:pub:rm`
+- `stack:pub:services`
+- `stack:ls`
+- `service:logs`
+- `inspect`
+- `sbot`
 
-swarm nodes:
+## configuration
 
-- manager
-  - traefik things
-    - mount acme
-  - buttcloud-provider
+TODO environment variables
 
-  - database
-    - mount storage
-- worker
-  - butt things
-    - data volume from cinder
+### `STACK_NAME`
 
+### `HOST`
 
-```
-volumes:
-  ssb:
-    external:
-      name: ${COMPOSE_PROJECT_NAME}-ssb
-```
-
-each pub needs it's own port.
-
-can be anything except what docker swarm needs: 2377, 7946, and 4789, so maybe start at 10000 and count up.
+### `WEB_NETWORK`

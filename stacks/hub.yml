@@ -1,43 +1,5 @@
 version: "3.6"
 services:
-  peer-server:
-    image: buttcloud/butt-peer-server:v1.1.0
-    ports:
-      - target: 8008
-        published: 8008
-    environment:
-      - ssb_host=0.0.0.0
-      - ssb_externalHost=${HOST:-example.butt.nz}
-    volumes:
-      - ssb:/home/node/.ssb
-    labels:
-      - "traefik.enable=false"
-    deploy:
-      restart_policy:
-        condition: on-failure
-    networks:
-      - ssb
-
-  landing:
-    image: buttcloud/butt-landing:v1.0.3
-    environment:
-      - ssb_host=${STACK_NAME}_peer-server
-      - ssb_landing__host=0.0.0.0
-    volumes:
-      - ssb:/home/node/.ssb
-    deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.backend=${STACK_NAME}_landing"
-        - "traefik.port=8901"
-        - "traefik.frontend.rule=Host:${HOST:-example.butt.nz}"
-        - "traefik.docker.network=${STACK_NAME}_web"
-      restart_policy:
-        condition: on-failure
-    networks:
-      - web
-      - ssb
-
   webproxy:
     image: traefik:1.5
     command:
@@ -80,10 +42,10 @@ services:
       - web
 
 volumes:
-  ssb:
   traefik-acme:
 
 networks:
   web:
+    external: true
   ssb:
     attachable: true
