@@ -1,7 +1,7 @@
 version: "3.6"
 services:
   peer-server:
-    image: buttcloud/butt-peer-server:v1.1.0
+    image: buttcloud/buttpub-peer-server
     ports:
       - target: 8008
         published: 8008
@@ -28,7 +28,7 @@ services:
       - ssb
 
   landing:
-    image: buttcloud/butt-landing:v1.0.3
+    image: buttcloud/buttpub-landing
     environment:
       - ssb_host=${STACK_NAME}_peer-server
       - ssb_landing__host=0.0.0.0

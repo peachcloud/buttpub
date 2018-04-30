@@ -1,4 +1,4 @@
-# butt
+# buttpub
 
 _work in progress_
 
@@ -10,8 +10,8 @@ a complete, production-quality [Scuttlebutt](https://scuttlebutt.nz) pub server
 - [install Docker Compose](https://docs.docker.com/compose/install/#install-compose)
 
 ```
-git clone https://github.com/buttcloud/butt
-cd butt
+git clone https://github.com/buttcloud/buttpub
+cd buttpub
 npm run swarm:init
 npm run network:web:create
 npm run stack:hub:deploy
