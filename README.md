@@ -1,53 +1,79 @@
-# buttpub
+# butthub
 
-_work in progress_
+## local dev
 
-a complete, production-quality [Scuttlebutt](https://scuttlebutt.nz) pub server
+- install VirtualBox > 5
+- [install `docker-machine`](https://docs.docker.com/machine/install-machine/#install-machine-directly)
+- enable virtualization in your BIOS
 
-## usage
+create docker machines
 
-- [install Docker](https://docs.docker.com/engine/installation/)
-- [install Docker Compose](https://docs.docker.com/compose/install/#install-compose)
-
-```
-git clone https://github.com/buttcloud/buttpub
-cd buttpub
-npm run swarm:init
-npm run network:web:create
-npm run stack:hub:deploy
-npm run stack:pub:deploy
-npm run sbot whoami
-curl -H "Host: example.butt.nz" localhost
+```shell
+docker-machine create -d virtualbox manager
+docker-machine create -d virtualbox worker0
+docker-machine create -d virtualbox worker1
 ```
 
-## scripts
+start the swarm with the manager
 
-`npm run ${command}`
+```shell
+docker-machine ssh manager docker swarm init --advertise-addr $(docker-machine ip manager)
+```
 
-- `swarm:init`
-- `network:web:create`
-- `network:web:rm`
-- `volume:ssb:create`
-- `volume:ssb:rm`
-- `stack:hub:deploy`
-- `stack:hub:ps`
-- `stack:hub:rm`
-- `stack:hub:services`
-- `stack:pub:deploy`
-- `stack:pub:ps`
-- `stack:pub:rm`
-- `stack:pub:services`
-- `stack:ls`
-- `service:logs`
-- `inspect`
-- `sbot`
+join the swarm with each worker
 
-## configuration
+```shell
+docker-machine ssh worker0 docker swarm join --token $(docker-machine ssh manager docker swarm join-token worker -q) $(docker-machine ip manager)
+docker-machine ssh worker1 docker swarm join --token $(docker-machine ssh manager docker swarm join-token worker -q) $(docker-machine ip manager)
+```
 
-TODO environment variables
+check out your swarm!
 
-### `STACK_NAME`
+```shell
+docker-machine ssh manager docker node ls
+```
 
-### `HOST`
+get ready to use your local docker command to impersonate the manager node
 
-### `WEB_NETWORK`
+```shell
+eval $(docker-machine env manager)
+```
+
+```shell
+npm install
+npm run stack
+npm run up
+```
+
+check out the stack!
+
+```shell
+docker service ls
+```
+
+wait until the services are replicated (they are probably downloading images)
+
+spin down the stack
+
+```shell
+npm run down
+```
+
+spin down the machines (`stop` or `rm`)
+
+```shell
+docker-machine stop manager
+docker-machine stop worker0
+docker-machine stop worker1
+```
+
+reset your local docker environment
+
+```
+eval $(docker-machine env -u)
+```
+
+## resources
+
+- [Docker Get Started, Part 4: Swarms](https://docs.docker.com/get-started/part4/)
+- [Docker Swarm With Docker Machine, Scripts](https://mmorejon.github.io/en/blog/docker-swarm-with-docker-machine-scripts/)

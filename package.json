@@ -1,21 +1,17 @@
 {
+  "name": "peachpub",
+  "version": "0.0.0",
+  "dependencies": {
+    "gyne": "^2.2.0",
+    "ramda": "^0.25.0"
+  },
+  "devDependencies": {},
   "scripts": {
-    "swarm:init": "docker swarm init",
-    "network:web:create": "docker network create --driver=overlay web",
-    "network:web:rm": "docker network rm web",
-    "volume:ssb:create": "docker volume create example_ssb",
-    "volume:ssb:rm": "docker volume rm example_ssb",
-    "stack:hub:deploy": "STACK_NAME=hub docker stack deploy --compose-file stacks/hub.yml hub",
-    "stack:hub:ps": "docker stack ps hub",
-    "stack:hub:rm": "docker stack rm hub",
-    "stack:hub:services": "docker stack services hub",
-    "stack:pub:deploy": "STACK_NAME=pub docker stack deploy --compose-file stacks/pub.yml pub",
-    "stack:pub:ps": "docker stack ps pub",
-    "stack:pub:rm": "docker stack rm pub",
-    "stack:pub:services": "docker stack services pub",
-    "stack:ls": "docker stack ls",
-    "service:logs": "docker service logs",
-    "inspect": "docker inspect",
-    "sbot": "docker run -it --rm --init -v pub_ssb:/home/node/.ssb --net pub_ssb -e ssb_host=pub_peer-server buttcloud/butt-peer-client"
-  }
+    "stack": "node bin/stack",
+    "up": "gyne up stack-config.json",
+    "stackup": "npm run stack && npm run up",
+    "down": "gyne down",
+    "sbot": "docker run -it --rm -v test_butt_nz__ssb:/home/node/.ssb --net test_butt_nz__ssb -e ssb_host=test_butt_nz__peer-server peachcloud/peachpub-peer-client"
+  },
+  "license": "AGPL-3.0"
 }
