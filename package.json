@@ -7,11 +7,6 @@
   },
   "devDependencies": {},
   "scripts": {
-    "stack": "node bin/stack",
-    "up": "gyne up stack-config.json",
-    "stackup": "npm run stack && npm run up",
-    "down": "gyne down",
-    "sbot": "docker run -it --rm -v test_butt_nz__ssb:/home/node/.ssb --net test_butt_nz__ssb -e ssb_host=test_butt_nz__peer-server peachcloud/peachpub-peer-client"
   },
   "license": "AGPL-3.0"
 }

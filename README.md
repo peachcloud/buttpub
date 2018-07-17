@@ -1,79 +1,80 @@
-# butthub
+# peachpub
 
-## local dev
+a fully featured Scuttlebutt pub platform!
 
-- install VirtualBox > 5
-- [install `docker-machine`](https://docs.docker.com/machine/install-machine/#install-machine-directly)
-- enable virtualization in your BIOS
+a standalone, self-hosted version of the infrastructure developed for [PeachCloud](http://peachcloud.org)
 
-create docker machines
+## getting started
 
-```shell
-docker-machine create -d virtualbox manager
-docker-machine create -d virtualbox worker0
-docker-machine create -d virtualbox worker1
-```
+### one-click
 
-start the swarm with the manager
+TODO
 
-```shell
-docker-machine ssh manager docker swarm init --advertise-addr $(docker-machine ip manager)
-```
+### manual
 
-join the swarm with each worker
+first, spin up a new cloud server running the latest [Debian Linux](https://www.debian.org/)!
+
+possible providers are [DigitalOcean](https://www.digitalocean.com/), [OVH](https://www.ovh.com/world/), [Scaleway](https://www.scaleway.com/), [Rackspace](https://www.rackspace.com/), ...
+
+on your new server
 
 ```shell
-docker-machine ssh worker0 docker swarm join --token $(docker-machine ssh manager docker swarm join-token worker -q) $(docker-machine ip manager)
-docker-machine ssh worker1 docker swarm join --token $(docker-machine ssh manager docker swarm join-token worker -q) $(docker-machine ip manager)
+apt update
+apt upgrade -y
+apt install -y sudo git curl
 ```
 
-check out your swarm!
+create a `peach` user who will run our systems
 
 ```shell
-docker-machine ssh manager docker node ls
+adduser peach sudo
 ```
 
-get ready to use your local docker command to impersonate the manager node
+then install Docker:
 
 ```shell
-eval $(docker-machine env manager)
+apt install -y apt-transport-https ca-certificates software-properties-common
+wget https://download.docker.com/linux/debian/gpg -O docker-gpg
+sudo apt-key add docker-gpg
+echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee -a /etc/apt/sources.list.d/docker.list
+apt update
+apt install -y docker-ce
+systemctl start docker
+systemctl enable docker
+adduser peach docker
 ```
+
+then as the `peach` user,
+
+install [Node.js](http://nodejs.org/) using [`nvm`](https://github.com/creationix/nvm).
 
 ```shell
-npm install
-npm run stack
-npm run up
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+source ~/.nvm/nvm.sh
 ```
 
-check out the stack!
-
-```shell
-docker service ls
-```
-
-wait until the services are replicated (they are probably downloading images)
-
-spin down the stack
-
-```shell
-npm run down
-```
-
-spin down the machines (`stop` or `rm`)
-
-```shell
-docker-machine stop manager
-docker-machine stop worker0
-docker-machine stop worker1
-```
-
-reset your local docker environment
+then install `peachpub`:
 
 ```
-eval $(docker-machine env -u)
+npm install --global peachpub
 ```
 
-## resources
+### your first pub
 
-- [Docker Get Started, Part 4: Swarms](https://docs.docker.com/get-started/part4/)
-- [Docker Swarm With Docker Machine, Scripts](https://mmorejon.github.io/en/blog/docker-swarm-with-docker-machine-scripts/)
+to initialize your `peachpub` config, run:
+
+```
+peachpub init
+```
+
+this will create an empty config in `~/.peachpub/config`
+
+to add your first pub to this config, run:
+
+```
+peachpub create
+```
+
+```
+peachpub update
+```
